@@ -15,6 +15,9 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 public class TweetDeserializer extends StdDeserializer<Tweet> {
 
+	private static final long serialVersionUID = 1L;
+	
+	
 	SimpleDateFormat format = new SimpleDateFormat(
 			"E MMM dd HH:mm:ss +0000 yyyy");
 

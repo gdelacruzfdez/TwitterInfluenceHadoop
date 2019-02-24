@@ -2,12 +2,12 @@ package inputformat;
 
 import java.io.IOException;
 
-import model.CompositeTweetKey;
 import model.Tweet;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
@@ -19,18 +19,18 @@ import org.apache.hadoop.util.LineReader;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class TweetInputFormat extends FileInputFormat<CompositeTweetKey, Tweet> {
+public class TweetInputFormat extends FileInputFormat<LongWritable, Tweet> {
 
 	@Override
-	public RecordReader<CompositeTweetKey, Tweet> createRecordReader(
+	public RecordReader<LongWritable, Tweet> createRecordReader(
 			InputSplit split, TaskAttemptContext context) throws IOException,
 			InterruptedException {
 		return new TweetReader();
 	}
 
-	static class TweetReader extends RecordReader<CompositeTweetKey, Tweet> {
+	static class TweetReader extends RecordReader<LongWritable, Tweet> {
 
-		private CompositeTweetKey key = new CompositeTweetKey(); // user
+		private LongWritable key = new LongWritable(); // Tweet ID
 		private Tweet value;
 		private LineReader in;
 		private long start;
@@ -74,15 +74,13 @@ public class TweetInputFormat extends FileInputFormat<CompositeTweetKey, Tweet> 
 				return false;
 			}
 			value = mapper.readValue(line.toString(), Tweet.class);
-			key.setUser(value.getUser());
-			key.setTimestamp(value.getTimestamp());
-
+			key.set(value.getId());
 			return true;
 
 		}
 
 		@Override
-		public CompositeTweetKey getCurrentKey() throws IOException,
+		public LongWritable getCurrentKey() throws IOException,
 				InterruptedException {
 			return key;
 		}
